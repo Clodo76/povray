@@ -240,9 +240,9 @@ void Camera::Init()
     H_Angle = 360;
     V_Angle = 180;
 
-	/* Default for spherical ODS */
-	IPD = 0.065; // Standard Interpupillary distance in average human
-	ODS = 0; // Top/Bottom
+    /* Default for spherical ODS */
+    IPD = 0.065; // Standard Interpupillary distance in average human
+    ODS = 0; // Top/Bottom
 
     /* Do not perturb primary rays by default. [DB 7/94] */
     Tnormal = NULL;
