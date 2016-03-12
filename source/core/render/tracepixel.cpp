@@ -712,7 +712,7 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 				ray.Direction[2] = -cos(theta) * cos(phi);
 
 				// Right-handed ODS algorithm to POV-Ray left-handed coordinate system
-				//ray.Direction[2] *= -1;
+				ray.Direction[2] *= -1;
 			}
 			
 			if (useFocalBlur)
