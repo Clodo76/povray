@@ -1659,7 +1659,15 @@ void Parser::Parse_Camera (Camera& Cam)
                         New.V_Angle = Allow_Float(New.H_Angle * 0.5);
                         if (New.V_Angle < 0.0)
                             Error("Negative vertical angle not allowed.");
-                    END_CASE
+					END_CASE
+
+					CASE (IPD_TOKEN)
+						New.IPD = Parse_Float();					 
+					END_CASE
+
+					CASE (ODS_TOKEN)
+						New.ODS = Parse_Int();
+					END_CASE
 
                     CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
                     CASE3(CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)

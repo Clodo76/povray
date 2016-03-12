@@ -618,31 +618,108 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 
         // spherical camera: x is horizontal, y vertical, V_Angle - vertical FOV, H_Angle - horizontal FOV
         case SPHERICAL_CAMERA:
-            // Convert the x coordinate to be a DBL from -0.5 to 0.5.
-            x0 = x / width - 0.5;
+		{
+			if (camera.ODS == 0) // Original SPHERICAL_CAMERA
+			{
+				// Convert the x coordinate to be a DBL from -0.5 to 0.5.
+				x0 = x / width - 0.5;
 
-            // Convert the y coordinate to be a DBL from -0.5 to 0.5.
-            y0 = 0.5 - y / height;
+				// Convert the y coordinate to be a DBL from -0.5 to 0.5.
+				y0 = 0.5 - y / height;
 
-            // get angle in radians
-            y0 *= (camera.V_Angle / 360) * TWO_M_PI;
-            x0 *= (camera.H_Angle / 360) * TWO_M_PI;
+				// get angle in radians
+				y0 *= (camera.V_Angle / 360) * TWO_M_PI;
+				x0 *= (camera.H_Angle / 360) * TWO_M_PI;
 
-            // find latitude for y in 3D space
-            Compute_Axis_Rotation_Transform(&Trans, cameraRight, -y0);
-            MTransPoint (V1, cameraDirection, &Trans);
+				// find latitude for y in 3D space
+				Compute_Axis_Rotation_Transform(&Trans, cameraRight, -y0);
+				MTransPoint(V1, cameraDirection, &Trans);
 
-            // Now take V1 and find longitude based on x
-            Compute_Axis_Rotation_Transform(&Trans, cameraUp, x0);
+				// Now take V1 and find longitude based on x
+				Compute_Axis_Rotation_Transform(&Trans, cameraUp, x0);
 
-            // Create primary ray.
-            MTransPoint(ray.Direction, V1, &Trans);
+				// Create primary ray.
+				MTransPoint(ray.Direction, V1, &Trans);
+			}
+			else
+			{
+				DBL ipd = camera.IPD;
+				int mode = camera.ODS; // 0: nostereo (same as spherical), 1: left eye, 2: right eye, 3: side-by-side, 4: top/bottom
 
-            if(useFocalBlur)
-                JitterCameraRay(ray, x, y, ray_number);
+				// Convert the x coordinate to be a DBL from 0 to 1.
+				x0 = x / width;
 
-            InitRayContainerState(ray, useFocalBlur);
-            break;
+				// Convert the y coordinate to be a DBL from 0 to 1.
+				y0 = y / height;
+
+				int eye = 0;
+				if (mode == 0)
+				{
+					eye = 0;
+				}
+				else if (mode == 1)
+				{
+					eye = -1;
+				}
+				else if (mode == 2)
+				{
+					eye = +1;
+				}
+				else if (mode == 3)
+				{
+					if (x0 < 0.5) // Left eye on Left
+					{
+						x0 *= 2;
+						eye = -1;
+					}
+					else // Right eye on Right
+					{
+						x0 -= 0.5;
+						x0 *= 2;
+						eye = +1;
+					}
+				}
+				else if (mode == 4)
+				{
+					if (y0 < 0.5) // Left eye on Top
+					{
+						y0 *= 2;
+						eye = -1;
+					}
+					else // Right eye on Bottom
+					{
+						y0 -= 0.5;
+						y0 *= 2;
+						eye = +1;
+					}
+				}
+
+				// Formulas based on ODS: https://developers.google.com/cardboard/jump/rendering-ods-content.pdf
+				DBL pi = M_PI;
+
+				DBL theta = x0 * 2 * pi - pi;
+				DBL phi = pi / 2 - y0*pi;
+
+				DBL scale = eye * ipd / 2;
+
+				ray.Origin[0] = cameraLocation[0] + cos(theta) * scale;
+				ray.Origin[1] = cameraLocation[1] + 0;
+				ray.Origin[2] = cameraLocation[2] + sin(theta) * scale;
+
+				// WARNING: feature missing, the current cameraDirection must be used to consider the front/central view.
+				ray.Direction[0] = sin(theta) * cos(phi);
+				ray.Direction[1] = sin(phi);
+				ray.Direction[2] = -cos(theta) * cos(phi);
+
+				// Right-handed ODS algorithm to POV-Ray left-handed coordinate system
+				//ray.Direction[2] *= -1;
+			}
+			
+			if (useFocalBlur)
+				JitterCameraRay(ray, x, y, ray_number);
+
+			InitRayContainerState(ray, true);
+		} break;
 
         case MESH_CAMERA:
             // in the case of the mesh camera, we don't want any pixel co-ordinates that are outside
