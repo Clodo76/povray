@@ -342,8 +342,8 @@ Camera& Camera::operator=(const Camera& src)
     Angle = src.Angle;
     H_Angle = src.H_Angle;
     V_Angle = src.V_Angle;
-	IPD = src.IPD;
-	ODS = src.ODS;
+    IPD = src.IPD;
+    ODS = src.ODS;
 
     if (Tnormal != NULL)
         Destroy_Tnormal(Tnormal);
