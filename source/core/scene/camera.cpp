@@ -243,6 +243,9 @@ void Camera::Init()
     /* Default for spherical ODS */
     IPD = 0.065; // Standard Interpupillary distance in average human
     ODS = 0; // Top/Bottom
+    ODS_Angle = 0;
+	ODS_Modulation = 0.2;
+	ODS_Handedness = -1;
 
     /* Do not perturb primary rays by default. [DB 7/94] */
     Tnormal = NULL;
@@ -344,6 +347,9 @@ Camera& Camera::operator=(const Camera& src)
     V_Angle = src.V_Angle;
     IPD = src.IPD;
     ODS = src.ODS;
+    ODS_Angle = src.ODS_Angle;
+	ODS_Modulation = src.ODS_Modulation;
+    ODS_Handedness = src.ODS_Handedness;
 
     if (Tnormal != NULL)
         Destroy_Tnormal(Tnormal);

@@ -90,6 +90,9 @@ public:
     DBL V_Angle;                    // Spherical verticle viewing angle
     DBL IPD;                        // Spherical IPD for ODS
     int ODS;                        // Spherical mode for ODS
+	DBL ODS_Angle;					// Spherical starting angle for ODS
+	DBL ODS_Modulation;				// Spherical vertical modulation for ODS
+    int ODS_Handedness;
     TNORMAL *Tnormal;               // Primary ray pertubation.
     TRANSFORM *Trans;               // Used only to record the user's input
     PIGMENT *Bokeh;                 // Pigment to use for the bokeh

@@ -694,13 +694,19 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 					}
 				}
 
+				x0 += camera.ODS_Angle / 360;
+
+				// https://www.wolframalpha.com/input/?i=0.065*pow(sin((x%2B0.5)*pi),0.0005)+range+-0.5..0.5
+				DBL ipd2 = (ipd * pow(sin((y0)*M_PI), camera.ODS_Modulation));
+				//DBL ipd2 = ipd;
+
 				// Formulas based on ODS: https://developers.google.com/cardboard/jump/rendering-ods-content.pdf
 				DBL pi = M_PI;
 
 				DBL theta = x0 * 2 * pi - pi;
 				DBL phi = pi / 2 - y0*pi;
 
-				DBL scale = eye * ipd / 2;
+				DBL scale = eye * ipd2 / 2;
 
 				ray.Origin[0] = cameraLocation[0] + cos(theta) * scale;
 				ray.Origin[1] = cameraLocation[1] + 0;
@@ -712,7 +718,8 @@ bool TracePixel::CreateCameraRay(Ray& ray, DBL x, DBL y, DBL width, DBL height, 
 				ray.Direction[2] = -cos(theta) * cos(phi);
 
 				// Right-handed ODS algorithm to POV-Ray left-handed coordinate system
-				ray.Direction[2] *= -1;
+				ray.Origin[2] *= camera.ODS_Handedness;
+				ray.Direction[2] *= camera.ODS_Handedness;
 			}
 			
 			if (useFocalBlur)

@@ -1669,6 +1669,18 @@ void Parser::Parse_Camera (Camera& Cam)
                         New.ODS = Parse_Int();
                     END_CASE
 
+                    CASE(ODS_ANGLE_TOKEN)
+                        New.ODS_Angle = Parse_Float();
+					END_CASE
+
+                    CASE(ODS_MODULATION_TOKEN)
+                        New.ODS_Modulation = Parse_Float();
+                    END_CASE
+
+                    CASE(ODS_HANDEDNESS_TOKEN)
+                        New.ODS_Handedness = Parse_Int();
+                    END_CASE
+
                     CASE6(PERSPECTIVE_TOKEN, ORTHOGRAPHIC_TOKEN, FISHEYE_TOKEN, ULTRA_WIDE_ANGLE_TOKEN, OMNIMAX_TOKEN, PANORAMIC_TOKEN)
                     CASE3(CYLINDER_TOKEN, MESH_CAMERA_TOKEN, USER_DEFINED_TOKEN)
                         Expectation_Error("spherical camera modifier");
